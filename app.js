@@ -256,8 +256,6 @@
       this.exportCsvBtn = $(`export-csv-btn`);
       this.exportJsonBtn = $(`export-json-btn`);
       this.exportPngBtn = $(`export-png-btn`);
-      // Prefer an explicit text export button if present; fall back to JSON or PNG button
-      this.exportTextBtn = $(`export-text-btn`) || $(`export-json-btn`) || $(`export-png-btn`);
 
       // Timer presets
       this.timerPresetsView = $(`timer-presets-view`);
@@ -1555,6 +1553,7 @@
       // CSV/JSON exports for laps
       const exportCsv = this.ui.exportCsvBtn;
       const exportJson = this.ui.exportJsonBtn;
+      const exportPng = this.ui.exportPngBtn;
 
       const buildSession = () => {
         return {
@@ -1592,19 +1591,86 @@
       });
 
       exportJson?.addEventListener("click", () => {
+        if (!this.stopwatch.laps.length) return;
         const session = buildSession();
         download("nova_stopwatch_session.json", JSON.stringify(session, null, 2), "application/json");
       });
 
-      // PNG/Text fallback: just export JSON/text for now
-      this.ui.exportTextBtn?.addEventListener?.("click", () => {
+      exportPng?.addEventListener("click", () => {
         if (!this.stopwatch.laps.length) return;
-        download("nova_stopwatch_laps.txt", this.stopwatch.laps.map((ms, i) => `#${i + 1} ${formatMMSS(ms)}.${formatCentiseconds(ms)}`).join("\n"));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = 1200;
+        canvas.height = 720;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, "#10131f");
+        gradient.addColorStop(0.55, "#151b2e");
+        gradient.addColorStop(1, "#090b12");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = "rgba(255, 214, 102, 0.35)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(36, 36, canvas.width - 72, canvas.height - 72);
+
+        ctx.fillStyle = "#f7d774";
+        ctx.font = "700 54px Inter, Arial, sans-serif";
+        ctx.fillText("NOVA Stopwatch", 80, 116);
+
+        ctx.fillStyle = "#e9eefc";
+        ctx.font = "600 34px Inter, Arial, sans-serif";
+        ctx.fillText(`Total Time: ${formatMMSS(this.stopwatch.elapsedMs)}.${formatCentiseconds(this.stopwatch.elapsedMs)}`, 80, 180);
+        ctx.fillText(`Total Laps: ${this.stopwatch.laps.length}`, 80, 228);
+
+        const fastest = Math.min(...this.stopwatch.laps);
+        const slowest = Math.max(...this.stopwatch.laps);
+        const average = this.stopwatch.laps.reduce((a, b) => a + b, 0) / this.stopwatch.laps.length;
+        ctx.font = "500 26px Inter, Arial, sans-serif";
+        ctx.fillStyle = "#aeb8d4";
+        ctx.fillText(`Fastest: ${formatMMSS(fastest)}.${formatCentiseconds(fastest)}`, 80, 288);
+        ctx.fillText(`Slowest: ${formatMMSS(slowest)}.${formatCentiseconds(slowest)}`, 80, 326);
+        ctx.fillText(`Average: ${formatMMSS(average)}.${formatCentiseconds(average)}`, 80, 364);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "600 28px Inter, Arial, sans-serif";
+        ctx.fillText("Lap Summary", 80, 438);
+
+        ctx.font = "500 24px Inter, Arial, sans-serif";
+        const visibleLaps = this.stopwatch.laps.slice(0, 8);
+        visibleLaps.forEach((ms, i) => {
+          const y = 492 + i * 34;
+          ctx.fillStyle = i % 2 === 0 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.08)";
+          ctx.fillRect(80, y - 25, 520, 30);
+          ctx.fillStyle = "#e9eefc";
+          ctx.fillText(`#${i + 1}`, 104, y);
+          ctx.fillStyle = "#f7d774";
+          ctx.fillText(`${formatMMSS(ms)}.${formatCentiseconds(ms)}`, 210, y);
+        });
+
+        if (this.stopwatch.laps.length > visibleLaps.length) {
+          ctx.fillStyle = "#aeb8d4";
+          ctx.fillText(`+ ${this.stopwatch.laps.length - visibleLaps.length} more laps`, 104, 492 + visibleLaps.length * 34);
+        }
+
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "nova_stopwatch_summary.png";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        }, "image/png");
       });
 
       const syncExportButtons = () => {
         const enabled = this.stopwatch.laps.length > 0;
-        for (const b of [this.ui.exportCsvBtn, this.ui.exportJsonBtn, this.ui.exportPngBtn, this.ui.exportTextBtn]) {
+        for (const b of [this.ui.exportCsvBtn, this.ui.exportJsonBtn, this.ui.exportPngBtn]) {
           if (b) b.disabled = !enabled;
         }
       };
