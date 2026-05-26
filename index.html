@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Meta: Charset & Viewport -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Meta: SEO -->
+  <title>NOVA Stopwatch - Modern Timer with Pomodoro & Lap Tracking</title>
+  <meta name="description" content="NOVA Stopwatch: Free, modern stopwatch app with timer, pomodoro, lap tracking, focus mode, and 6 color themes. Zero dependencies. No sign-up required.">
+  <meta name="keywords" content="stopwatch, timer, pomodoro, productivity, focus, lap tracking, free web app">
+  <meta name="author" content="Siddhant Naik">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Meta: Open Graph (Social Sharing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NOVA Stopwatch - Modern Timer & Pomodoro">
+  <meta property="og:description" content="Feature-rich stopwatch with timer, pomodoro, lap tracking, and focus mode. Zero dependencies, fully accessible, 6 color themes.">
+  <meta property="og:url" content="https://nova-stopwatch.netlify.app">
+  <meta property="og:image" content="https://nova-stopwatch.netlify.app/og-image.png">
+  <meta property="og:site_name" content="NOVA Stopwatch">
+
+  <!-- Meta: Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NOVA Stopwatch - Modern Timer & Pomodoro">
+  <meta name="twitter:description" content="Feature-rich stopwatch with timer, pomodoro, lap tracking, and focus mode. Zero dependencies, fully accessible.">
+  <meta name="twitter:image" content="https://nova-stopwatch.netlify.app/og-image.png">
+  <meta name="twitter:creator" content="@Siddhantnaik909">
+
+  <!-- Meta: Color & Theme -->
+  <meta name="theme-color" content="#0f0f1e">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Meta: Apple -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NOVA Stopwatch">
+
+  <!-- Meta: Preload & Prefetch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Icons (future: replace with actual favicon) -->
+  <!-- <link rel="icon" type="image/svg+xml" href="/favicon.svg"> -->
+  <!-- <link rel="icon" type="image/png" href="/favicon.png"> -->
+  <!-- <link rel="apple-touch-icon" href="/apple-touch-icon.png"> -->
+
+  <!-- Manifest (PWA - future) -->
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "NOVA Stopwatch",
+    "description": "Modern, feature-rich stopwatch with timer, pomodoro, lap tracking, and focus mode",
+    "url": "https://nova-stopwatch.netlify.app",
+    "author": {
+      "@type": "Person",
+      "name": "Siddhant Naik"
+    },
+    "applicationCategory": "ProductivityApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-noise"></div>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+    <div class="bg-sweep"></div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║         FOCUS MODE OVERLAY              ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="focus-overlay" id="focus-overlay" role="dialog" aria-label="Focus Mode" aria-hidden="true">
+    <div class="focus-content">
+      <div class="focus-mode-label">FOCUS MODE</div>
+      <div class="focus-time" id="focus-time-display">00:00<span class="focus-ms">.00</span></div>
+      <div class="focus-status" id="focus-status-text">READY</div>
+      <div class="focus-controls">
+        <button class="focus-ctrl-btn" id="focus-start-btn" aria-label="Start or pause">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="focus-play-icon"><polygon points="5 3 19 12 5 21"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" class="focus-pause-icon hidden"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        </button>
+      </div>
+      <button class="focus-exit-btn" id="focus-exit-btn" aria-label="Exit focus mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        EXIT FOCUS
+      </button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║         ALARM RINGING OVERLAY           ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="alarm-overlay" id="alarm-overlay" role="alertdialog" aria-label="Alarm finished" aria-hidden="true">
+    <div class="alarm-modal">
+      <div class="alarm-glow-ring"></div>
+      <div class="alarm-icon-wrap">
+        <svg class="alarm-bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+      <h2 class="alarm-title">TIME'S UP!</h2>
+      <p class="alarm-subtitle">Your countdown has finished.</p>
+      <button class="btn-alarm-dismiss" id="alarm-dismiss-btn" aria-label="Dismiss alarm">
+        <span>STOP ALARM</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║       KEYBOARD SHORTCUTS MODAL          ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="modal-overlay" id="shortcuts-modal" role="dialog" aria-label="Keyboard shortcuts" aria-hidden="true">
+    <div class="modal-card shortcuts-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Keyboard Shortcuts</h3>
+        <button class="icon-btn close-modal-btn" id="close-shortcuts-btn" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="shortcuts-grid">
+        <div class="shortcut-item"><kbd>Space</kbd><span>Start / Pause</span></div>
+        <div class="shortcut-item"><kbd>L</kbd><span>Record Lap</span></div>
+        <div class="shortcut-item"><kbd>R</kbd><span>Hold to Reset</span></div>
+        <div class="shortcut-item"><kbd>T</kbd><span>Cycle Theme</span></div>
+        <div class="shortcut-item"><kbd>F</kbd><span>Focus Mode</span></div>
+        <div class="shortcut-item"><kbd>M</kbd><span>Mini Widget</span></div>
+        <div class="shortcut-item"><kbd>?</kbd><span>Show Shortcuts</span></div>
+        <div class="shortcut-item"><kbd>Esc</kbd><span>Close Overlays</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║         SETTINGS OVERLAY               ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="modal-overlay settings-modal-overlay" id="settings-modal" role="dialog" aria-label="Settings" aria-hidden="true">
+    <div class="modal-card settings-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Settings</h3>
+        <button class="icon-btn close-modal-btn" id="close-settings-btn" aria-label="Close settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="settings-body">
+
+        <!-- Theme -->
+        <div class="settings-section">
+          <div class="settings-section-label">Color Theme</div>
+          <div class="theme-grid" role="radiogroup" aria-label="Select theme">
+            <button class="theme-chip active" data-theme-val="cyber-gold" role="radio" aria-checked="true" title="Cyber Gold">
+              <span class="theme-chip-swatch"></span><span>Cyber Gold</span>
+            </button>
+            <button class="theme-chip" data-theme-val="neon-blue" role="radio" aria-checked="false" title="Neon Blue">
+              <span class="theme-chip-swatch"></span><span>Neon Blue</span>
+            </button>
+            <button class="theme-chip" data-theme-val="matrix-green" role="radio" aria-checked="false" title="Matrix Green">
+              <span class="theme-chip-swatch"></span><span>Matrix Green</span>
+            </button>
+            <button class="theme-chip" data-theme-val="crimson-red" role="radio" aria-checked="false" title="Crimson Red">
+              <span class="theme-chip-swatch"></span><span>Crimson Red</span>
+            </button>
+            <button class="theme-chip" data-theme-val="vaporwave" role="radio" aria-checked="false" title="Purple Vaporwave">
+              <span class="theme-chip-swatch"></span><span>Vaporwave</span>
+            </button>
+            <button class="theme-chip" data-theme-val="midnight-eclipse" role="radio" aria-checked="false" title="Midnight Eclipse">
+              <span class="theme-chip-swatch"></span><span>Eclipse</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sound -->
+        <div class="settings-section">
+          <div class="settings-section-label">Sound Effects</div>
+          <select id="sound-mode-select" class="settings-select" aria-label="Sound effects">
+            <option value="mechanical">Retro Watch Click</option>
+            <option value="digital">Modern Beep</option>
+            <option value="none">Muted</option>
+          </select>
+        </div>
+
+        <!-- Alarm Sound -->
+        <div class="settings-section">
+          <div class="settings-section-label">Alarm Style</div>
+          <select id="alarm-sound-select" class="settings-select" aria-label="Alarm sound style">
+            <option value="chime">Gentle Chime</option>
+            <option value="alert">Digital Siren</option>
+          </select>
+        </div>
+
+        <!-- Ticking -->
+        <div class="settings-section settings-row">
+          <label for="ticking-toggle" class="settings-section-label">Ticking Sound</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="ticking-toggle" role="switch" aria-label="Enable ticking sound">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+
+        <!-- Precision -->
+        <div class="settings-section">
+          <div class="settings-section-label">Show Milliseconds</div>
+          <div class="segmented-control" role="radiogroup" aria-label="Show milliseconds">
+            <button class="seg-btn active" id="btn-prec-2" data-precision="2" role="radio" aria-checked="true">Normal (.00)</button>
+            <button class="seg-btn" id="btn-prec-3" data-precision="3" role="radio" aria-checked="false">Extra (.000)</button>
+          </div>
+        </div>
+
+        <!-- Animations -->
+        <div class="settings-section settings-row">
+          <label for="particles-toggle" class="settings-section-label">Particle Effects</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="particles-toggle" checked role="switch" aria-label="Enable particle effects">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║       SESSION HISTORY MODAL             ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="modal-overlay" id="history-modal" role="dialog" aria-label="Session history" aria-hidden="true">
+    <div class="modal-card history-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Session History</h3>
+        <button class="icon-btn close-modal-btn" id="close-history-btn" aria-label="Close history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="history-body" id="history-body">
+        <div class="history-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="history-empty-icon"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <p>No saved sessions yet.</p>
+          <span>Use "Save Session" after recording laps.</span>
+        </div>
+      </div>
+      <div class="history-footer">
+        <button class="btn-outline" id="save-session-btn">Save Current Session</button>
+        <button class="btn-outline btn-danger-outline" id="clear-history-btn">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║          MINI FLOATING WIDGET           ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="mini-widget" id="mini-widget" role="complementary" aria-label="Mini stopwatch widget" aria-hidden="true">
+    <div class="mini-widget-drag-handle" id="mini-widget-handle" aria-label="Drag to move widget">⠿</div>
+    <div class="mini-widget-time" id="mini-widget-time">00:00.00</div>
+    <div class="mini-widget-controls">
+      <button class="mini-widget-btn" id="mini-widget-start" aria-label="Start or pause">
+        <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon"><polygon points="5 3 19 12 5 21"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" class="pause-icon hidden"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+      </button>
+      <button class="mini-widget-btn mini-widget-lap" id="mini-widget-lap" aria-label="Lap" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </button>
+      <button class="mini-widget-btn mini-widget-close" id="mini-widget-close" aria-label="Close mini widget">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║             MAIN APPLICATION            ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+  <div class="app-shell" role="main">
+
+    <!-- ─── TOP HEADER ─── -->
+    <header class="app-header" role="banner">
+      <div class="header-brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" class="brand-logo-svg">
+            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+            <circle cx="16" cy="16" r="8" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="16" y1="8" x2="16" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="16" x2="21" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-name">NOVA</h1>
+          <span class="brand-sub">TIMER APP</span>
+        </div>
+        <div class="header-status">
+          <span class="status-dot idle" id="header-status-dot" aria-hidden="true"></span>
+          <span class="status-text" id="header-status-text" aria-live="polite">READY</span>
+        </div>
+      </div>
+
+      <nav class="header-actions" aria-label="App controls">
+        <button class="icon-btn" id="focus-mode-btn" aria-label="Enter focus mode" title="Focus Mode (F)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 9V6a1 1 0 0 1 1-1h3M15 3h3a1 1 0 0 1 1 1v3M3 15v3a1 1 0 0 1 1 1h3M15 21h3a1 1 0 0 1 1-1v-3"/></svg>
+        </button>
+        <button class="icon-btn" id="mini-widget-btn" aria-label="Mini floating widget" title="Mini Widget (M)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+        <button class="icon-btn" id="history-btn" aria-label="Session history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg>
+        </button>
+        <button class="icon-btn" id="shortcuts-btn" aria-label="Keyboard shortcuts" title="Shortcuts (?)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h1M9 10h1M12 10h1M15 10h1M18 10h1M6 14h1M9 14h6M17 14h1"/></svg>
+        </button>
+        <button class="icon-btn" id="settings-toggle-btn" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <!-- ─── MAIN WORKSPACE ─── -->
+    <div class="workspace">
+
+      <!-- ══════════════════════════════════════════ -->
+      <!-- LEFT PANEL: Main Timer                 -->
+      <!-- ══════════════════════════════════════════ -->
+      <section class="panel chrono-panel" aria-label="Main Timer">
+
+        <!-- Mode Tabs -->
+        <div class="mode-tabs" role="tablist" aria-label="Timer mode">
+          <button class="mode-tab active" id="tab-stopwatch" role="tab" aria-selected="true" aria-controls="stopwatch-content" data-mode="stopwatch">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon"><circle cx="10" cy="10" r="8"/><path d="M10 5v5l3 1.5"/></svg>
+            Stopwatch
+          </button>
+          <button class="mode-tab" id="tab-timer" role="tab" aria-selected="false" aria-controls="timer-content" data-mode="timer">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon"><circle cx="10" cy="11" r="7"/><path d="M10 4v4M7 2h6"/></svg>
+            Alarm Timer
+          </button>
+          <button class="mode-tab" id="tab-pomodoro" role="tab" aria-selected="false" aria-controls="pomodoro-content" data-mode="pomodoro">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="tab-icon"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M8 10h4M10 8v4"/></svg>
+            Focus Study
+          </button>
+          <div class="tab-slider" id="tab-slider" aria-hidden="true"></div>
+        </div>
+
+        <!-- ─── DIAL ZONE ─── -->
+        <div class="dial-zone" role="img" aria-label="Timer display">
+
+          <!-- SVG Rings -->
+          <svg class="dial-svg" viewBox="0 0 220 220" aria-hidden="true">
+            <defs>
+              <!-- Glow filter -->
+              <filter id="ring-glow" x="-25%" y="-25%" width="150%" height="150%">
+                <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <filter id="ring-glow-strong" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="6" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <!-- Radial gradient fill for dial -->
+              <radialGradient id="dial-fill" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="var(--dial-center)" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="var(--dial-outer)" stop-opacity="0.95"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Outer decorative ring with tick marks -->
+            <circle cx="110" cy="110" r="104" fill="url(#dial-fill)" stroke="var(--border-dim)" stroke-width="1"/>
+            <!-- Tick marks (static) -->
+            <circle cx="110" cy="110" r="101" fill="none" stroke="var(--border-tick)" stroke-width="3" stroke-dasharray="1.5 9.17"/>
+            <!-- Subticks -->
+            <circle cx="110" cy="110" r="101" fill="none" stroke="var(--accent-dim)" stroke-width="1" stroke-dasharray="0.5 2.29" opacity="0.4"/>
+
+            <!-- ── Track rings ── -->
+            <circle cx="110" cy="110" r="86" class="ring-track" fill="none" stroke="var(--ring-track)" stroke-width="2"/>
+            <circle cx="110" cy="110" r="93" class="ring-track" fill="none" stroke="var(--ring-track)" stroke-width="2"/>
+            <circle cx="110" cy="110" r="100" class="ring-track" fill="none" stroke="var(--ring-track)" stroke-width="1.5"/>
+
+            <!-- ── Active progress rings (Minute / Second / Ms) ── -->
+            <circle cx="110" cy="110" r="86" class="ring-progress ring-minute" id="progress-minute" fill="none"
+              stroke="var(--accent-tertiary)" stroke-width="3" stroke-linecap="round"
+              filter="url(#ring-glow)"/>
+            <circle cx="110" cy="110" r="93" class="ring-progress ring-second" id="progress-second" fill="none"
+              stroke="var(--accent-secondary)" stroke-width="3.5" stroke-linecap="round"
+              filter="url(#ring-glow)"/>
+            <circle cx="110" cy="110" r="100" class="ring-progress ring-ms" id="progress-ms" fill="none"
+              stroke="var(--accent-primary)" stroke-width="4" stroke-linecap="round"
+              filter="url(#ring-glow-strong)"/>
+
+            <!-- Sweep glow dot on ms ring -->
+            <circle class="ring-sweep-dot" id="sweep-dot" cx="110" cy="10" r="4" fill="var(--accent-primary)" filter="url(#ring-glow-strong)" opacity="0"/>
+          </svg>
+
+          <!-- ─── Inner readout ─── -->
+          <div class="dial-readout" id="dial-content-block">
+
+            <!-- Standard numeric readout -->
+            <div id="readout-numeric-area">
+              <div class="readout-label" id="readout-status" aria-live="polite">READY</div>
+              <div class="readout-time-wrap">
+                <div class="readout-time" id="main-time-display" aria-live="off">00:00</div><span class="readout-ms" id="main-ms-display">.00</span>
+              </div>
+              <div class="readout-lap-line" id="sub-lap-display" aria-live="polite">LAP 1 — 00:00.00</div>
+            </div>
+
+            <!-- Timer setup spinner -->
+            <div class="timer-setup" id="timer-setup-panel" aria-label="Set countdown duration" hidden>
+              <div class="setup-group">
+                <button class="spin-btn" data-adjust="min-up" aria-label="Increase minutes">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                </button>
+                <span class="spin-val" id="setup-min">05</span>
+                <button class="spin-btn" data-adjust="min-down" aria-label="Decrease minutes">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+              </div>
+              <span class="spin-sep">:</span>
+              <div class="setup-group">
+                <button class="spin-btn" data-adjust="sec-up" aria-label="Increase seconds">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                </button>
+                <span class="spin-val" id="setup-sec">00</span>
+                <button class="spin-btn" data-adjust="sec-down" aria-label="Decrease seconds">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Focus mode display -->
+            <div class="pomodoro-setup" id="pomodoro-setup-panel" hidden>
+              <div class="pom-phase-label" id="pom-phase-label">WORK TIME</div>
+              <div class="pom-cycles" id="pom-cycles-display">
+                <span class="pom-dot active"></span><span class="pom-dot"></span><span class="pom-dot"></span><span class="pom-dot"></span>
+              </div>
+            </div>
+
+          </div><!-- /dial-readout -->
+        </div><!-- /dial-zone -->
+
+        <!-- ─── CONTROL ROW ─── -->
+        <div class="control-row" role="group" aria-label="Timer controls">
+
+          <!-- LAP / BACK button -->
+          <button class="ctrl-btn ctrl-secondary" id="lap-btn" disabled aria-label="Record lap (L)">
+            <div class="btn-ripple" aria-hidden="true"></div>
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span id="lap-btn-text">LAP</span>
+          </button>
+
+          <!-- PRIMARY START/PAUSE -->
+          <button class="ctrl-btn ctrl-primary" id="start-btn" aria-label="Start or pause (Space)">
+            <div class="btn-ripple" aria-hidden="true"></div>
+            <div class="btn-inner">
+              <svg class="ctrl-icon play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+              <svg class="ctrl-icon pause-icon hidden" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+              <span id="start-btn-text">START</span>
+            </div>
+          </button>
+
+          <!-- RESET -->
+          <button class="ctrl-btn ctrl-danger" id="reset-btn" disabled aria-label="Hold to reset (R)">
+            <div class="btn-ripple" aria-hidden="true"></div>
+            <div class="reset-hold-bar" id="reset-hold-bar" aria-hidden="true"></div>
+            <svg class="ctrl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span id="reset-btn-text">RESET</span>
+          </button>
+        </div>
+
+        <!-- ─── KEYBOARD HINT BAR ─── -->
+        <div class="kb-hints" aria-hidden="true">
+          <span><kbd>Space</kbd> Start/Pause</span>
+          <span id="kb-legend-lap"><kbd>L</kbd> Lap</span>
+          <span><kbd>R</kbd> Hold Reset</span>
+          <span><kbd>F</kbd> Focus</span>
+        </div>
+
+      </section><!-- /chrono-panel -->
+
+
+      <!-- ══════════════════════════════════════════ -->
+      <!-- RIGHT PANEL: Stats & History             -->
+      <!-- ══════════════════════════════════════════ -->
+      <section class="panel telemetry-panel" aria-label="Stats and history">
+
+        <!-- ─── Panel tabs ─── -->
+        <div class="telemetry-tabs">
+          <div class="telemetry-title" id="telemetry-section-title">LAP HISTORY</div>
+          <div class="telemetry-actions" id="stopwatch-actions-panel">
+            <button class="action-btn" id="clear-data-btn" disabled aria-label="Clear all laps">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Clear
+            </button>
+            <button class="action-btn" id="export-csv-btn" disabled aria-label="Save as Excel file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Excel
+            </button>
+            <button class="action-btn" id="export-json-btn" disabled aria-label="Save as text file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              Text
+            </button>
+            <button class="action-btn" id="export-png-btn" disabled aria-label="Save as picture">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              Picture
+            </button>
+          </div>
+        </div>
+
+        <!-- ─── STOPWATCH VIEW ─── -->
+        <div id="stopwatch-telemetry-view" role="tabpanel">
+
+          <!-- Analytics Strip -->
+          <div class="analytics-strip" id="analytics-strip">
+            <div class="stat-block">
+              <span class="stat-lbl">LAPS</span>
+              <span class="stat-val mono" id="stat-total-laps">—</span>
+            </div>
+            <div class="stat-block best">
+              <span class="stat-lbl">FASTEST</span>
+              <span class="stat-val mono" id="stat-fastest-lap">—</span>
+              <span class="stat-sub" id="stat-fastest-num">—</span>
+            </div>
+            <div class="stat-block worst">
+              <span class="stat-lbl">SLOWEST</span>
+              <span class="stat-val mono" id="stat-slowest-lap">—</span>
+              <span class="stat-sub" id="stat-slowest-num">—</span>
+            </div>
+            <div class="stat-block">
+              <span class="stat-lbl">AVERAGE</span>
+              <span class="stat-val mono" id="stat-average-lap">—</span>
+            </div>
+          </div>
+
+          <!-- Sparkline chart -->
+          <div class="sparkline-wrap" id="sparkline-wrap" hidden>
+            <span class="sparkline-label">LAP TREND</span>
+            <canvas id="sparkline-canvas" height="40" aria-label="Lap time trend chart" role="img"></canvas>
+          </div>
+
+          <!-- Search -->
+          <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" class="search-input" id="lap-search-input" placeholder="Search laps…" disabled aria-label="Search laps">
+          </div>
+
+          <!-- Lap table -->
+          <div class="lap-table-wrap" role="region" aria-label="Lap times">
+            <table class="lap-table" aria-label="Recorded laps">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Label</th>
+                  <th scope="col">Lap Time</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Δ Avg</th>
+                </tr>
+              </thead>
+              <tbody id="lap-tbody">
+                <tr class="empty-row">
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="empty-icon"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                      <span>No laps recorded yet.</span>
+                      <span class="empty-sub">Start and press <kbd>L</kbd> to record a lap.</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /stopwatch-telemetry-view -->
+
+        <!-- ─── TIMER PRESETS VIEW ─── -->
+        <div id="timer-presets-view" hidden role="tabpanel">
+          <div class="presets-section-label">QUICK PRESETS</div>
+          <div class="presets-grid" role="group" aria-label="Quick timer presets">
+            <button class="preset-btn" data-preset="1" aria-label="Set 1 minute timer">1 MIN</button>
+            <button class="preset-btn" data-preset="2" aria-label="Set 2 minute timer">2 MIN</button>
+            <button class="preset-btn" data-preset="5" aria-label="Set 5 minute timer">5 MIN</button>
+            <button class="preset-btn" data-preset="10" aria-label="Set 10 minute timer">10 MIN</button>
+            <button class="preset-btn" data-preset="15" aria-label="Set 15 minute timer">15 MIN</button>
+            <button class="preset-btn" data-preset="30" aria-label="Set 30 minute timer">30 MIN</button>
+            <button class="preset-btn" data-preset="45" aria-label="Set 45 minute timer">45 MIN</button>
+            <button class="preset-btn" data-preset="60" aria-label="Set 1 hour timer">1 HOUR</button>
+          </div>
+
+          <div class="presets-section-label" style="margin-top:1rem">ADJUST DURATION</div>
+          <div class="adjust-grid" role="group" aria-label="Adjust timer duration">
+            <button class="adjust-btn-sm" data-add="-60" aria-label="Subtract 1 minute">−1 MIN</button>
+            <button class="adjust-btn-sm" data-add="-30" aria-label="Subtract 30 seconds">−30 SEC</button>
+            <button class="adjust-btn-sm" data-add="30" aria-label="Add 30 seconds">+30 SEC</button>
+            <button class="adjust-btn-sm" data-add="60" aria-label="Add 1 minute">+1 MIN</button>
+            <button class="adjust-btn-sm" data-add="300" aria-label="Add 5 minutes">+5 MIN</button>
+          </div>
+
+          <div class="presets-section-label" style="margin-top:1rem">COUNTDOWN PROGRESS</div>
+          <div class="progress-track">
+            <div class="progress-fill" id="timer-progress-fill"></div>
+          </div>
+
+          <!-- Companion Stopwatch Widget -->
+          <div class="companion-wrap" id="mini-stopwatch-widget">
+            <div class="presets-section-label">STOPWATCH COMPANION</div>
+            <div class="companion-card">
+              <div class="companion-header">
+                <span class="mini-status-dot idle" id="mini-stopwatch-status-dot"></span>
+                <span class="mini-status-text" id="mini-stopwatch-status-text">READY</span>
+                <button class="companion-jump-btn" id="mini-stopwatch-jump-btn" aria-label="Switch to stopwatch tab">OPEN ↗</button>
+              </div>
+              <div class="companion-body">
+                <div class="companion-time" id="mini-stopwatch-time">00:00.00</div>
+                <div class="companion-controls">
+                  <button class="companion-btn" id="mini-stopwatch-start-btn" aria-label="Start or pause stopwatch">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon"><polygon points="5 3 19 12 5 21"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="pause-icon hidden"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                  </button>
+                  <button class="companion-btn" id="mini-stopwatch-lap-btn" disabled aria-label="Lap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  </button>
+                  <button class="companion-btn" id="mini-stopwatch-reset-btn" disabled aria-label="Reset stopwatch">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /timer-presets-view -->
+
+        <!-- ─── FOCUS STUDY VIEW ─── -->
+        <div id="pomodoro-view" hidden role="tabpanel">
+          <div class="pom-phases" role="group" aria-label="Study phases">
+            <button class="pom-phase-btn active" data-pom="work" aria-pressed="true">Work<span>25 min</span></button>
+            <button class="pom-phase-btn" data-pom="short" aria-pressed="false">Short Break<span>5 min</span></button>
+            <button class="pom-phase-btn" data-pom="long" aria-pressed="false">Long Break<span>15 min</span></button>
+          </div>
+
+          <div class="pom-custom">
+            <div class="pom-custom-item">
+              <label class="pom-custom-label">Work (min)</label>
+              <input type="number" class="pom-input" id="pom-work-input" value="25" min="1" max="90" aria-label="Work duration in minutes">
+            </div>
+            <div class="pom-custom-item">
+              <label class="pom-custom-label">Short Break (min)</label>
+              <input type="number" class="pom-input" id="pom-short-input" value="5" min="1" max="30" aria-label="Short break duration in minutes">
+            </div>
+            <div class="pom-custom-item">
+              <label class="pom-custom-label">Long Break (min)</label>
+              <input type="number" class="pom-input" id="pom-long-input" value="15" min="1" max="60" aria-label="Long break duration in minutes">
+            </div>
+          </div>
+
+          <div class="pom-stats">
+            <div class="pom-stat-block">
+              <span class="stat-lbl">SESSIONS TODAY</span>
+              <span class="stat-val mono" id="pom-sessions-count">0</span>
+            </div>
+            <div class="pom-stat-block">
+              <span class="stat-lbl">FOCUS TIME</span>
+              <span class="stat-val mono" id="pom-focus-time">0m</span>
+            </div>
+            <div class="pom-stat-block">
+              <span class="stat-lbl">CYCLE</span>
+              <span class="stat-val mono" id="pom-cycle-count">1 / 4</span>
+            </div>
+          </div>
+        </div><!-- /pomodoro-view -->
+
+      </section><!-- /telemetry-panel -->
+
+    </div><!-- /workspace -->
+  </div><!-- /app-shell -->
+
+  <!-- Core script -->
+  <script src="app.js"></script>
+</body>
+</html>
