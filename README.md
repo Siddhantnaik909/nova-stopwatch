@@ -1,169 +1,97 @@
-# NOVA Stopwatch - Modern Web Application
+# NOVA Stopwatch
 
-A feature-rich stopwatch application with timer, pomodoro, focus mode, lap tracking, and more.
+A modern static stopwatch web app built with only HTML, CSS, and JavaScript. It works directly on GitHub Pages without Node.js, npm, a backend server, or a build step.
 
-GitHub: https://github.com/Siddhantnaik909/nova-stopwatch
+[Live Preview](https://siddhantnaik909.github.io/nova-stopwatch/) | [GitHub Repository](https://github.com/Siddhantnaik909/nova-stopwatch) | [Report an Issue](https://github.com/Siddhantnaik909/nova-stopwatch/issues)
+
+## Live Preview
+
+Try the app here:
+
+https://siddhantnaik909.github.io/nova-stopwatch/
 
 ## Features
 
-- ⏱️ **Stopwatch** - Classic time tracking with centisecond precision
-- ⏲️ **Timer** - Countdown timer with audio alarm
-- 🍅 **Pomodoro** - Work/break cycles for productivity
-- 🎯 **Focus Mode** - Fullscreen immersive timing experience
-- 📊 **Lap Tracking** - Record and view lap times
-- 🔔 **Alarms** - Visual and audio notifications
-- ⌨️ **Keyboard Shortcuts** - Fast control without mouse
-- 📱 **Responsive Design** - Works on desktop, tablet, mobile
-- 💾 **History Export** - Save and export session data
-- 🎨 **Modern UI** - Clean, minimalist interface with smooth animations
+- Stopwatch with centisecond precision
+- Countdown timer with audio and visual alarm feedback
+- Pomodoro mode for focus and break sessions
+- Fullscreen focus mode
+- Lap tracking and session history
+- Mini widget mode
+- CSV and JSON export
+- Keyboard shortcuts
+- Responsive design for desktop, tablet, and mobile
+- Six themes: Cyber Gold, Neon Blue, Matrix Green, Crimson Red, Vaporwave, and Midnight Eclipse
+- Smooth CSS animations and animated progress rings
+- No backend and no framework dependency
 
-## Getting Started
+## Animations
 
-### Prerequisites
-- Node.js 18+ (for development tools)
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Python 3.6+ (for dev server alternative)
+The interface includes polished static-site animations:
 
-### Installation
+- Animated timing rings
+- Smooth mode transitions
+- Focus overlay animation
+- Alarm glow feedback
+- Button hover and press states
+- Modal open and close transitions
+- Theme-aware motion effects
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Siddhantnaik909/nova-stopwatch.git
-   cd nova-stopwatch
-   ```
+## Project Files
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+Only the core static app files are required:
 
-3. **Start development server**
-   ```bash
-   npm start
-   ```
-   Opens server on `http://localhost:8000`
-
-### Without npm
-Run Python's built-in server:
-```bash
-python -m http.server 8000
+```text
+.
+|-- index.html    App layout and HTML structure
+|-- style.css     Styling, responsive layout, themes, and animations
+`-- app.js        Stopwatch, timer, Pomodoro, laps, history, and UI logic
 ```
 
-### Static HTML Deployment
-The project can be deployed as a static site because it uses only `index.html`, `app.js`, and `style.css`.
+Extra documentation files such as `README.md`, `LICENSE`, and GitHub templates do not affect the live app.
 
-- Copy the project folder to any static host
-- Open `index.html` in a browser for a local preview
-- Use GitHub Pages, Netlify, or Vercel for easy hosting
+## Run Locally
 
-## Project Structure
+No installation is required. Open `index.html` directly in a browser.
 
-```
-├── index.html       - Main HTML with UI structure
-├── app.js          - Application logic (strict mode)
-├── style.css       - Styling and animations
-├── package.json    - npm configuration
-├── .eslintrc.json  - ESLint rules
-├── .prettierrc.json - Code formatting
-└── README.md       - This file
-```
+For a local static preview, you can use any simple static server, but it is optional.
 
-## Available Commands
+## GitHub Pages Deployment
 
-| Command | Purpose |
-|---------|---------|
-| `npm start` | Start dev server on port 8000 |
-| `npm run dev` | Same as start |
-| `npm run lint` | Check code with ESLint |
-| `npm run format` | Auto-format code with Prettier |
-| `npm run build` | Run build process |
+This project is ready for GitHub Pages because it is fully static.
 
-## Architecture
-
-### Stopwatch Logic
-- IIFE (Immediately Invoked Function Expression) for encapsulation
-- Strict mode for better error detection
-- Timer loop using `requestAnimationFrame` for smooth updates
-- State machine for Stopwatch/Timer/Pomodoro modes
-- Utility functions for time formatting and calculations
-
-### UI Components
-- **Focus Mode Overlay** - Fullscreen timer display
-- **Alarm Overlay** - Alert when timer ends
-- **Shortcuts Panel** - Keyboard shortcut reference
-- **Settings Panel** - Configuration options
-- **History Tab** - View past sessions
-- **Mini Widget** - Compact timer display
-
-### DOM Selectors
-All UI elements use ID-based selectors (e.g., `#focus-overlay`, `#alarm-overlay`).
+1. Push the repository to GitHub.
+2. Open the repository settings.
+3. Go to Pages.
+4. Select the branch that contains `index.html`.
+5. Save the Pages settings.
+6. Open `https://siddhantnaik909.github.io/nova-stopwatch/`.
 
 ## Keyboard Shortcuts
 
-- `Space` - Start/Pause
-- `R` - Reset
-- `L` - Record Lap
-- `F` - Focus Mode
-- `H` - Show History
-- `S` - Settings
-- `?` - Show Shortcuts
-
-## Code Quality
-
-- **ESLint** - Enforces consistent code style
-- **Prettier** - Auto-formats code
-- **Strict Mode** - Catches common mistakes
-- **Modern JS** - ES2021+ features
+| Key | Action |
+| --- | --- |
+| `Space` | Start or pause |
+| `L` | Record lap |
+| `R` | Reset |
+| `T` | Cycle theme |
+| `F` | Enter focus mode |
+| `M` | Toggle mini widget |
+| `?` | Show shortcuts |
+| `Esc` | Close overlays |
 
 ## Browser Support
 
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Performance
-
-- No external framework dependencies
-- Optimized animation loops
-- Minimal DOM manipulation
-- Efficient event listeners
-- Local storage for persistence
-
-## Development Tips
-
-1. **Check code quality**
-   ```bash
-   npm run lint
-   ```
-
-2. **Format before commit**
-   ```bash
-   npm run format
-   ```
-
-3. **Use browser DevTools**
-   - Inspect elements with Elements panel
-   - Debug with Sources panel
-   - Monitor performance with Performance tab
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+- Chrome and Edge
+- Firefox
+- Safari
+- iOS Safari
+- Chrome for Android
 
 ## License
 
-MIT License - See LICENSE file for details
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-## Contact & Support
+## Author
 
-- Issues: [GitHub Issues](https://github.com/yourusername/nova-stopwatch/issues)
-- Email: your.email@example.com
-
----
-
-**Happy timing! ⏱️**
+Created by [Siddhant Naik](https://github.com/Siddhantnaik909).
